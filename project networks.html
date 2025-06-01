@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Smart TDS Water Quality Monitor</title>
+  <title>Smart TDS Water Quality Monitor </title>
 
+  <!-- MQTT client library -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -151,6 +152,7 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      font-family: 'Segoe UI', sans-serif;
     }
 
     #messageContent {
@@ -273,14 +275,6 @@
     }
 
     function updateChart(tdsValue) {
-      tdsElem.innerText = tdsValue.toFixed(1);
-
-      if (tdsValue === 0 || tdsValue.toFixed(1) === "0.0") {
-        statusBox.className = '';
-        statusBox.innerText = '--';
-        return;
-      }
-
       const now = new Date().toLocaleTimeString();
       chart.data.labels.push(now);
       chart.data.datasets[0].data.push(tdsValue);
@@ -288,7 +282,11 @@
       const color = tdsValue < safeThreshold ? '#28a745' : '#dc3545';
       chart.data.datasets[0].pointBackgroundColor.push(color);
 
-      if (tdsValue < safeThreshold) {
+      if (tdsValue === 0) {
+        statusBox.className = '';
+        statusBox.innerText = '--';
+        // Skip speaking for 0 values
+      } else if (tdsValue < safeThreshold) {
         statusBox.className = 'safe';
         statusBox.innerText = 'SAFE';
         speak("Water is safe.");
@@ -298,6 +296,7 @@
         speak("Warning, water is not safe.");
       }
 
+      tdsElem.innerText = tdsValue.toFixed(1);
       chart.update();
     }
 
@@ -305,7 +304,10 @@
 
     function unlockAudioAndConnect() {
       messageBox.style.display = 'none';
-      document.getElementById('safeAudio').play().catch(() => {});
+
+      // Prevent any initial audio playback on unlock
+      // document.getElementById('safeAudio').play().catch(() => {});
+
       client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
 
       client.on('connect', () => {
