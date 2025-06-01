@@ -172,7 +172,11 @@
     <div class="wave wave3"></div>
   </div>
 
-  <script>  
+  <!-- Audio Files -->
+  <audio id="safeAudio" src="safe.mp3"></audio>
+  <audio id="unsafeAudio" src="unsafe.mp3"></audio>
+
+  <script>
     const safeThreshold = 250;
     const topic = '/water_quality/tds123';
 
@@ -208,13 +212,19 @@
     const tdsElem = document.getElementById('tdsValue');
     const statusBox = document.getElementById('statusBox');
 
-    function speak(text) {
-      const msg = new SpeechSynthesisUtterance(text);
-      const voices = speechSynthesis.getVoices();
-      msg.voice = voices.find(v => v.name.toLowerCase().includes("female") || v.name.includes("Google UK English Female")) || voices[0];
-      msg.pitch = 1;
-      msg.rate = 1;
-      window.speechSynthesis.speak(msg);
+    const safeAudio = document.getElementById('safeAudio');
+    const unsafeAudio = document.getElementById('unsafeAudio');
+
+    function playAudio(isSafe) {
+      safeAudio.pause();
+      unsafeAudio.pause();
+      safeAudio.currentTime = 0;
+      unsafeAudio.currentTime = 0;
+      if (isSafe) {
+        safeAudio.play();
+      } else {
+        unsafeAudio.play();
+      }
     }
 
     function updateChart(tdsValue) {
@@ -225,14 +235,17 @@
       const color = tdsValue < safeThreshold ? '#28a745' : '#dc3545';
       chart.data.datasets[0].pointBackgroundColor.push(color);
 
-      if (tdsValue < safeThreshold) {
+      if (tdsValue === 0) {
+        statusBox.className = '';
+        statusBox.innerText = '--';
+      } else if (tdsValue < safeThreshold) {
         statusBox.className = 'safe';
         statusBox.innerText = 'SAFE';
-        speak("Water is safe.");
+        playAudio(true);
       } else {
         statusBox.className = 'unsafe';
         statusBox.innerText = 'UNSAFE';
-        speak("Warning, water is not safe.");
+        playAudio(false);
       }
 
       tdsElem.innerText = tdsValue.toFixed(1);
