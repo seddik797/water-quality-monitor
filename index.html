@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Smart TDS Water Quality Monitor</title>
+  <title>Smart TDS Water Quality Monitor </title>
 
+  <!-- # MQTT client library -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <!-- # Chart.js library for graphing -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -16,49 +18,40 @@
       overflow-x: hidden;
       user-select: none;
     }
-
     h1 {
       color: #0077be;
       text-shadow: 1px 1px 4px #fff;
     }
-
     p {
       color: #004d70;
     }
-
     #tdsValue {
       color: #00796b;
     }
-
     #audioNotice {
       font-size: 1.1em;
       color: #0077be;
       margin: 15px auto;
       opacity: 0.7;
     }
-
     .fade-in {
       opacity: 0;
       animation: fadeIn 1.5s ease forwards;
     }
-
     .slide-in {
       opacity: 0;
       transform: translateY(20px);
       animation: slideIn 1s ease forwards;
     }
-
     @keyframes fadeIn {
       to { opacity: 1; }
     }
-
     @keyframes slideIn {
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-
     .safe {
       background-color: #28a745cc;
       color: #fff;
@@ -68,7 +61,6 @@
       width: 100px;
       animation: pulseSafe 1.5s ease infinite;
     }
-
     .unsafe {
       background-color: #dc3545cc;
       color: #fff;
@@ -78,17 +70,14 @@
       width: 100px;
       animation: pulseUnsafe 1.5s ease infinite;
     }
-
     @keyframes pulseSafe {
       0%, 100% { box-shadow: 0 0 10px #28a74550; }
       50% { box-shadow: 0 0 20px #28a745aa; }
     }
-
     @keyframes pulseUnsafe {
       0%, 100% { box-shadow: 0 0 10px #dc354550; }
       50% { box-shadow: 0 0 20px #dc3545aa; }
     }
-
     .chart-box {
       margin: 20px auto;
       background: rgba(255, 255, 255, 0.1);
@@ -96,12 +85,10 @@
       border-radius: 12px;
       max-width: 90%;
     }
-
     canvas {
       display: block;
       margin: 0 auto;
     }
-
     .wave-container {
       position: fixed;
       bottom: 0;
@@ -110,38 +97,35 @@
       overflow: hidden;
       z-index: -1;
     }
-
     .waves {
       position: relative;
       width: 100%;
       height: 100%;
       min-height: 100px;
     }
-
     .waveGroup > use {
       animation: waveAnimation 25s linear infinite;
     }
-
     .waveGroup > use:nth-child(2) {
       animation-delay: -2s;
       animation-duration: 20s;
     }
-
     .waveGroup > use:nth-child(3) {
       animation-delay: -4s;
       animation-duration: 18s;
     }
-
     .waveGroup > use:nth-child(4) {
       animation-delay: -6s;
       animation-duration: 22s;
     }
-
     @keyframes waveAnimation {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
     }
-
     #messageBox {
       display: none;
       position: fixed;
@@ -151,8 +135,8 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      font-family: 'Segoe UI', sans-serif;
     }
-
     #messageContent {
       background: white;
       color: #0077be;
@@ -162,12 +146,10 @@
       text-align: center;
       max-width: 90%;
     }
-
     #messageContent p {
       font-size: 1.4em;
       margin-bottom: 20px;
     }
-
     #okButton {
       background-color: #0077be;
       border: none;
@@ -178,7 +160,6 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-
     #okButton:hover {
       background-color: #005f8e;
     }
@@ -187,7 +168,7 @@
 <body>
 
   <h1 class="fade-in">💧 Smart TDS Water Quality Monitor 💧</h1>
-
+  
   <div id="messageBox">
     <div id="messageContent">
       <p>Press OK To Test ...&lt;3</p>
@@ -266,21 +247,17 @@
 
     function speak(text) {
       if (text === "Water is safe.") {
-        document.getElementById('safeAudio').play();
+        const safeAudio = document.getElementById('safeAudio');
+        safeAudio.currentTime = 0;
+        safeAudio.play();
       } else if (text === "Warning, water is not safe.") {
-        document.getElementById('unsafeAudio').play();
+        const unsafeAudio = document.getElementById('unsafeAudio');
+        unsafeAudio.currentTime = 0;
+        unsafeAudio.play();
       }
     }
 
     function updateChart(tdsValue) {
-      tdsElem.innerText = tdsValue.toFixed(1);
-
-      if (tdsValue === 0 || tdsValue.toFixed(1) === "0.0") {
-        statusBox.className = '';
-        statusBox.innerText = '--';
-        return;
-      }
-
       const now = new Date().toLocaleTimeString();
       chart.data.labels.push(now);
       chart.data.datasets[0].data.push(tdsValue);
@@ -288,7 +265,14 @@
       const color = tdsValue < safeThreshold ? '#28a745' : '#dc3545';
       chart.data.datasets[0].pointBackgroundColor.push(color);
 
-      if (tdsValue < safeThreshold) {
+      // Always show TDS value, even if 0
+      tdsElem.innerText = tdsValue.toFixed(1);
+
+      if (tdsValue === 0) {
+        // Show placeholder status when 0, no speak
+        statusBox.className = '';
+        statusBox.innerText = '--';
+      } else if (tdsValue < safeThreshold) {
         statusBox.className = 'safe';
         statusBox.innerText = 'SAFE';
         speak("Water is safe.");
@@ -305,7 +289,9 @@
 
     function unlockAudioAndConnect() {
       messageBox.style.display = 'none';
-      document.getElementById('safeAudio').play().catch(() => {});
+
+      // Do NOT play any audio here on OK press
+
       client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
 
       client.on('connect', () => {
