@@ -10,6 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
+    /* # Base styles for body */
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #e0f7fa;
@@ -18,40 +19,62 @@
       overflow-x: hidden;
       user-select: none;
     }
+
+    /* # Main heading styling */
     h1 {
       color: #0077be;
       text-shadow: 1px 1px 4px #fff;
     }
+
+    /* # Paragraph text color */
     p {
       color: #004d70;
     }
+
+    /* # Color for TDS value display */
     #tdsValue {
       color: #00796b;
     }
+
+    /* # Styling for audio notice text */
     #audioNotice {
       font-size: 1.1em;
       color: #0077be;
       margin: 15px auto;
       opacity: 0.7;
     }
+
+    /* # Animations */
+
+    /* # Fade-in effect */
     .fade-in {
       opacity: 0;
       animation: fadeIn 1.5s ease forwards;
     }
+
+    /* # Slide-in effect */
     .slide-in {
       opacity: 0;
       transform: translateY(20px);
       animation: slideIn 1s ease forwards;
     }
+
+    /* # Keyframes for fade-in animation */
     @keyframes fadeIn {
       to { opacity: 1; }
     }
+
+    /* # Keyframes for slide-in animation */
     @keyframes slideIn {
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
+
+    /* # Status box styles */
+
+    /* # Styling for safe water status box */
     .safe {
       background-color: #28a745cc;
       color: #fff;
@@ -61,6 +84,8 @@
       width: 100px;
       animation: pulseSafe 1.5s ease infinite;
     }
+
+    /* # Styling for unsafe water status box */
     .unsafe {
       background-color: #dc3545cc;
       color: #fff;
@@ -70,14 +95,20 @@
       width: 100px;
       animation: pulseUnsafe 1.5s ease infinite;
     }
+
+    /* # Pulse animation for safe status */
     @keyframes pulseSafe {
       0%, 100% { box-shadow: 0 0 10px #28a74550; }
       50% { box-shadow: 0 0 20px #28a745aa; }
     }
+
+    /* # Pulse animation for unsafe status */
     @keyframes pulseUnsafe {
       0%, 100% { box-shadow: 0 0 10px #dc354550; }
       50% { box-shadow: 0 0 20px #dc3545aa; }
     }
+
+    /* # Chart container styling */
     .chart-box {
       margin: 20px auto;
       background: rgba(255, 255, 255, 0.1);
@@ -85,10 +116,14 @@
       border-radius: 12px;
       max-width: 90%;
     }
+
+    /* # Center canvas element */
     canvas {
       display: block;
       margin: 0 auto;
     }
+
+    /* # Wave background container styling */
     .wave-container {
       position: fixed;
       bottom: 0;
@@ -97,27 +132,33 @@
       overflow: hidden;
       z-index: -1;
     }
+
     .waves {
       position: relative;
       width: 100%;
       height: 100%;
       min-height: 100px;
     }
+
     .waveGroup > use {
       animation: waveAnimation 25s linear infinite;
     }
+
     .waveGroup > use:nth-child(2) {
       animation-delay: -2s;
       animation-duration: 20s;
     }
+
     .waveGroup > use:nth-child(3) {
       animation-delay: -4s;
       animation-duration: 18s;
     }
+
     .waveGroup > use:nth-child(4) {
       animation-delay: -6s;
       animation-duration: 22s;
     }
+
     @keyframes waveAnimation {
       0% {
         transform: translateX(0);
@@ -126,8 +167,10 @@
         transform: translateX(-50%);
       }
     }
+
+    /* # Message Box Styles */
     #messageBox {
-      display: none;
+      display: none; /* Hidden initially */
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.6);
@@ -137,6 +180,7 @@
       z-index: 1000;
       font-family: 'Segoe UI', sans-serif;
     }
+
     #messageContent {
       background: white;
       color: #0077be;
@@ -146,10 +190,12 @@
       text-align: center;
       max-width: 90%;
     }
+
     #messageContent p {
       font-size: 1.4em;
       margin-bottom: 20px;
     }
+
     #okButton {
       background-color: #0077be;
       border: none;
@@ -160,6 +206,7 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+
     #okButton:hover {
       background-color: #005f8e;
     }
@@ -167,8 +214,10 @@
 </head>
 <body>
 
+  <!-- # Main header with fade-in animation -->
   <h1 class="fade-in">💧 Smart TDS Water Quality Monitor 💧</h1>
   
+  <!-- # Message box will appear here AFTER fade-in finishes -->
   <div id="messageBox">
     <div id="messageContent">
       <p>Press OK To Test ...&lt;3</p>
@@ -176,16 +225,20 @@
     </div>
   </div>
 
+  <!-- # Current TDS display with slide-in and delay -->
   <p class="slide-in" style="animation-delay: 0.3s;">
     Current TDS: <span id="tdsValue">--</span> ppm
   </p>
 
+  <!-- # Status box to show SAFE or UNSAFE with slide-in and delay -->
   <div id="statusBox" class="slide-in" style="animation-delay: 0.6s;">--</div>
 
+  <!-- # Chart container with slide-in animation and delay -->
   <div class="chart-box slide-in" style="animation-delay: 0.9s;">
     <canvas id="tdsChart" width="700" height="300"></canvas>
   </div>
 
+  <!-- # New Animated SVG Wave background -->
   <div class="wave-container">
     <svg class="waves" xmlns="http://www.w3.org/2000/svg" 
          xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -205,19 +258,24 @@
     </svg>
   </div>
 
+  <!-- # Audio elements for safe and unsafe alerts -->
   <audio id="safeAudio" src="safe.mp3" preload="auto"></audio>
   <audio id="unsafeAudio" src="unsafe.mp3" preload="auto"></audio>
 
   <script>
+    // # Threshold for water safety
     const safeThreshold = 250;
+    // # MQTT topic to subscribe for TDS readings
     const topic = '/water_quality/tds123';
 
+    // # DOM elements
     const tdsElem = document.getElementById('tdsValue');
     const statusBox = document.getElementById('statusBox');
     const messageBox = document.getElementById('messageBox');
     const okButton = document.getElementById('okButton');
     const heading = document.querySelector('h1.fade-in');
 
+    // # Setup Chart.js line chart
     const ctx = document.getElementById('tdsChart').getContext('2d');
     const chart = new Chart(ctx, {
       type: 'line',
@@ -245,70 +303,101 @@
       }
     });
 
+    // Keep track of the last status to avoid audio spamming
+    let lastStatus = null; // can be 'safe' or 'unsafe' or null initially
+
+    /**
+     * # Plays appropriate audio based on water safety status, only if status changed
+     * @param {string} text - The status text ("Water is safe." or "Warning, water is not safe.")
+     */
     function speak(text) {
       if (text === "Water is safe.") {
         const safeAudio = document.getElementById('safeAudio');
+        safeAudio.pause();
         safeAudio.currentTime = 0;
         safeAudio.play();
       } else if (text === "Warning, water is not safe.") {
         const unsafeAudio = document.getElementById('unsafeAudio');
+        unsafeAudio.pause();
         unsafeAudio.currentTime = 0;
         unsafeAudio.play();
       }
     }
 
+    /**
+     * # Updates chart, status box, and TDS display based on new value
+     * @param {number} tdsValue - New TDS measurement
+     */
     function updateChart(tdsValue) {
       const now = new Date().toLocaleTimeString();
       chart.data.labels.push(now);
       chart.data.datasets[0].data.push(tdsValue);
 
+      // Set point color based on threshold
       const color = tdsValue < safeThreshold ? '#28a745' : '#dc3545';
       chart.data.datasets[0].pointBackgroundColor.push(color);
 
-      // Always show TDS value, even if 0
+      // Update TDS value text (always show the value)
       tdsElem.innerText = tdsValue.toFixed(1);
 
+      // If ppm is 0, update status but DO NOT speak
       if (tdsValue === 0) {
-        // Show placeholder status when 0, no speak
         statusBox.className = '';
         statusBox.innerText = '--';
+        lastStatus = null; // reset lastStatus so next real reading triggers audio
       } else if (tdsValue < safeThreshold) {
         statusBox.className = 'safe';
         statusBox.innerText = 'SAFE';
-        speak("Water is safe.");
+
+        // Only speak if status changed
+        if (lastStatus !== 'safe') {
+          speak("Water is safe.");
+          lastStatus = 'safe';
+        }
       } else {
         statusBox.className = 'unsafe';
         statusBox.innerText = 'UNSAFE';
-        speak("Warning, water is not safe.");
+
+        // Only speak if status changed
+        if (lastStatus !== 'unsafe') {
+          speak("Warning, water is not safe.");
+          lastStatus = 'unsafe';
+        }
       }
 
       chart.update();
     }
 
+    // # MQTT client variable
     let client = null;
 
+    // # Function to unlock audio & MQTT connection (called after OK pressed)
     function unlockAudioAndConnect() {
+      // Hide message box
       messageBox.style.display = 'none';
 
-      // Do NOT play any audio here on OK press
-
+      // Connect to public MQTT broker over secure websocket
       client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
 
+      // On successful MQTT connection
       client.on('connect', () => {
         console.log('Connected to MQTT broker');
         client.subscribe(topic);
       });
 
+      // On receiving MQTT messages on subscribed topic
       client.on('message', (topic, message) => {
         const value = parseFloat(message.toString());
         if (!isNaN(value)) updateChart(value);
       });
     }
 
+    // # Show the message box after the heading fade-in animation ends
     heading.addEventListener('animationend', () => {
       messageBox.style.display = 'flex';
     });
 
+    // # OK button triggers unlocking audio & MQTT (but no audio plays here)
     okButton.addEventListener('click', unlockAudioAndConnect);
   </script>
 </body>
