@@ -1,16 +1,16 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Smart TDS Water Quality Monitor </title>
+  <title>Smart TDS Water Quality Monitor</title>
 
-  <!-- # MQTT client library -->
+  <!-- MQTT client library -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-  <!-- # Chart.js library for graphing -->
+  <!-- Chart.js library for graphing -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    /* # Base styles for body */
+    /* Base styles for body */
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #e0f7fa;
@@ -20,23 +20,23 @@
       user-select: none;
     }
 
-    /* # Main heading styling */
+    /* Main heading styling */
     h1 {
       color: #0077be;
       text-shadow: 1px 1px 4px #fff;
     }
 
-    /* # Paragraph text color */
+    /* Paragraph text color */
     p {
       color: #004d70;
     }
 
-    /* # Color for TDS value display */
+    /* Color for TDS value display */
     #tdsValue {
       color: #00796b;
     }
 
-    /* # Styling for audio notice text */
+    /* Styling for audio notice text */
     #audioNotice {
       font-size: 1.1em;
       color: #0077be;
@@ -44,27 +44,27 @@
       opacity: 0.7;
     }
 
-    /* # Animations */
+    /* Animations */
 
-    /* # Fade-in effect */
+    /* Fade-in effect */
     .fade-in {
       opacity: 0;
       animation: fadeIn 1.5s ease forwards;
     }
 
-    /* # Slide-in effect */
+    /* Slide-in effect */
     .slide-in {
       opacity: 0;
       transform: translateY(20px);
       animation: slideIn 1s ease forwards;
     }
 
-    /* # Keyframes for fade-in animation */
+    /* Keyframes for fade-in animation */
     @keyframes fadeIn {
       to { opacity: 1; }
     }
 
-    /* # Keyframes for slide-in animation */
+    /* Keyframes for slide-in animation */
     @keyframes slideIn {
       to {
         opacity: 1;
@@ -72,9 +72,9 @@
       }
     }
 
-    /* # Status box styles */
+    /* Status box styles */
 
-    /* # Styling for safe water status box */
+    /* Styling for safe water status box */
     .safe {
       background-color: #28a745cc;
       color: #fff;
@@ -85,7 +85,7 @@
       animation: pulseSafe 1.5s ease infinite;
     }
 
-    /* # Styling for unsafe water status box */
+    /* Styling for unsafe water status box */
     .unsafe {
       background-color: #dc3545cc;
       color: #fff;
@@ -96,19 +96,19 @@
       animation: pulseUnsafe 1.5s ease infinite;
     }
 
-    /* # Pulse animation for safe status */
+    /* Pulse animation for safe status */
     @keyframes pulseSafe {
       0%, 100% { box-shadow: 0 0 10px #28a74550; }
       50% { box-shadow: 0 0 20px #28a745aa; }
     }
 
-    /* # Pulse animation for unsafe status */
+    /* Pulse animation for unsafe status */
     @keyframes pulseUnsafe {
       0%, 100% { box-shadow: 0 0 10px #dc354550; }
       50% { box-shadow: 0 0 20px #dc3545aa; }
     }
 
-    /* # Chart container styling */
+    /* Chart container styling */
     .chart-box {
       margin: 20px auto;
       background: rgba(255, 255, 255, 0.1);
@@ -117,13 +117,13 @@
       max-width: 90%;
     }
 
-    /* # Center canvas element */
+    /* Center canvas element */
     canvas {
       display: block;
       margin: 0 auto;
     }
 
-    /* # Wave background container styling */
+    /* Wave background container styling */
     .wave-container {
       position: fixed;
       bottom: 0;
@@ -168,9 +168,9 @@
       }
     }
 
-    /* # Message Box Styles */
+    /* Message Box Styles */
     #messageBox {
-      display: none; /* Hidden initially */
+      display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.6);
@@ -210,14 +210,84 @@
     #okButton:hover {
       background-color: #005f8e;
     }
+
+    /* Warning overlay styles */
+    #siteWarning.hidden {
+      display: none;
+    }
+
+    #siteWarning {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(220, 53, 69, 0.85);
+      color: white;
+      font-size: 2.5em;
+      font-weight: bold;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      animation: pulseWarning 0.5s ease-in-out;
+      text-shadow: 0 0 15px #fff, 0 0 20px #dc3545;
+    }
+
+    /* Safe water celebration */
+    #safeCelebration {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(40, 167, 69, 0.85);
+      color: white;
+      font-size: 2.5em;
+      font-weight: bold;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      animation: pulseSafeCelebration 0.5s ease-in-out;
+      text-shadow: 0 0 15px #fff, 0 0 20px #28a745;
+    }
+
+    /* TDS Zero Warning */
+    #tdsZeroWarning {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 119, 190, 0.9);
+      color: white;
+      padding: 20px 40px;
+      border-radius: 10px;
+      font-size: 1.5em;
+      font-weight: bold;
+      z-index: 2001;
+      display: none;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      animation: fadeInOut 0.5s ease-in-out;
+    }
+
+    /* Animation keyframes */
+    @keyframes pulseWarning {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes pulseSafeCelebration {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
   </style>
 </head>
 <body>
 
-  <!-- # Main header with fade-in animation -->
+  <!-- Main header with fade-in animation -->
   <h1 class="fade-in">💧 Smart TDS Water Quality Monitor 💧</h1>
   
-  <!-- # Message box will appear here AFTER fade-in finishes -->
+  <!-- Message box will appear here AFTER fade-in finishes -->
   <div id="messageBox">
     <div id="messageContent">
       <p>Press OK To Test ...&lt;3</p>
@@ -225,20 +295,30 @@
     </div>
   </div>
 
-  <!-- # Current TDS display with slide-in and delay -->
+  <!-- Current TDS display with slide-in and delay -->
   <p class="slide-in" style="animation-delay: 0.3s;">
     Current TDS: <span id="tdsValue">--</span> ppm
   </p>
 
-  <!-- # Status box to show SAFE or UNSAFE with slide-in and delay -->
+  <!-- Status box to show SAFE or UNSAFE with slide-in and delay -->
   <div id="statusBox" class="slide-in" style="animation-delay: 0.6s;">--</div>
 
-  <!-- # Chart container with slide-in animation and delay -->
+  <!-- Chart container with slide-in animation and delay -->
   <div class="chart-box slide-in" style="animation-delay: 0.9s;">
     <canvas id="tdsChart" width="700" height="300"></canvas>
   </div>
+  
+  <!-- TDS Zero Warning Message -->
+  <div id="tdsZeroWarning">Put The Sensor In The Water Please ..😊</div>
 
-  <!-- # New Animated SVG Wave background -->
+  <!-- Safe water celebration -->
+  <div id="safeCelebration">
+    <div class="celebrationContent">
+      🎉 Water is Safe to Drink! 🎉
+    </div>
+  </div>
+
+  <!-- New Animated SVG Wave background -->
   <div class="wave-container">
     <svg class="waves" xmlns="http://www.w3.org/2000/svg" 
          xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -258,24 +338,34 @@
     </svg>
   </div>
 
-  <!-- # Audio elements for safe and unsafe alerts -->
+  <!-- Audio elements for safe and unsafe alerts -->
   <audio id="safeAudio" src="safe.mp3" preload="auto"></audio>
   <audio id="unsafeAudio" src="unsafe.mp3" preload="auto"></audio>
 
+  <!-- Site-wide warning overlay for unsafe water -->
+  <div id="siteWarning" class="hidden">
+    <div class="warningContent">
+      ⚠️ WARNING: Water is Unsafe! ⚠️
+    </div>
+  </div>
+
   <script>
-    // # Threshold for water safety
+    // Threshold for water safety
     const safeThreshold = 250;
-    // # MQTT topic to subscribe for TDS readings
+    // MQTT topic to subscribe for TDS readings
     const topic = '/water_quality/tds123';
 
-    // # DOM elements
+    // DOM elements
     const tdsElem = document.getElementById('tdsValue');
     const statusBox = document.getElementById('statusBox');
     const messageBox = document.getElementById('messageBox');
     const okButton = document.getElementById('okButton');
     const heading = document.querySelector('h1.fade-in');
+    const siteWarning = document.getElementById('siteWarning');
+    const tdsZeroWarning = document.getElementById('tdsZeroWarning');
+    const safeCelebration = document.getElementById('safeCelebration');
 
-    // # Setup Chart.js line chart
+    // Setup Chart.js line chart
     const ctx = document.getElementById('tdsChart').getContext('2d');
     const chart = new Chart(ctx, {
       type: 'line',
@@ -304,11 +394,59 @@
     });
 
     // Keep track of the last status to avoid audio spamming
-    let lastStatus = null; // can be 'safe' or 'unsafe' or null initially
+    let lastStatus = null;
+    let isTdsZero = false;
+    let tdsZeroTimeout = null;
+    let statusTimeout = null;
+    let checkTdsInterval = null;
 
     /**
-     * # Plays appropriate audio based on water safety status, only if status changed
-     * @param {string} text - The status text ("Water is safe." or "Warning, water is not safe.")
+     * Show safe water celebration animation for 2 seconds
+     */
+    function showSafeCelebration() {
+      clearTimeout(statusTimeout);
+      safeCelebration.style.display = 'flex';
+      siteWarning.style.display = 'none';
+      
+      statusTimeout = setTimeout(() => {
+        safeCelebration.style.display = 'none';
+      }, 2000);
+    }
+
+    /**
+     * Show unsafe water warning for 2 seconds
+     */
+    function showUnsafeWarning() {
+      clearTimeout(statusTimeout);
+      siteWarning.style.display = 'flex';
+      safeCelebration.style.display = 'none';
+      
+      statusTimeout = setTimeout(() => {
+        siteWarning.style.display = 'none';
+      }, 2000);
+    }
+
+    /**
+     * Show TDS zero warning for 4 seconds and check again after 10 seconds
+     */
+    function showTdsZeroWarning() {
+      clearTimeout(tdsZeroTimeout);
+      tdsZeroWarning.style.display = 'block';
+      
+      tdsZeroTimeout = setTimeout(() => {
+        tdsZeroWarning.style.display = 'none';
+        
+        // Check again after 10 seconds if still zero
+        setTimeout(() => {
+          if (parseFloat(tdsElem.innerText) === 0) {
+            showTdsZeroWarning();
+          }
+        }, 10000);
+      }, 4000);
+    }
+
+    /**
+     * Plays appropriate audio based on water safety status
      */
     function speak(text) {
       if (text === "Water is safe.") {
@@ -325,42 +463,51 @@
     }
 
     /**
-     * # Updates chart, status box, and TDS display based on new value
-     * @param {number} tdsValue - New TDS measurement
+     * Updates chart, status box, TDS display, and warning overlay
      */
     function updateChart(tdsValue) {
-      const now = new Date().toLocaleTimeString();
-      chart.data.labels.push(now);
-      chart.data.datasets[0].data.push(tdsValue);
-
-      // Set point color based on threshold
-      const color = tdsValue < safeThreshold ? '#28a745' : '#dc3545';
-      chart.data.datasets[0].pointBackgroundColor.push(color);
-
-      // Update TDS value text (always show the value)
       tdsElem.innerText = tdsValue.toFixed(1);
 
-      // If ppm is 0, update status but DO NOT speak
       if (tdsValue === 0) {
+        showTdsZeroWarning();
         statusBox.className = '';
         statusBox.innerText = '--';
-        lastStatus = null; // reset lastStatus so next real reading triggers audio
-      } else if (tdsValue < safeThreshold) {
+        
+        if (lastStatus !== null) {
+          lastStatus = null;
+        }
+        
+        isTdsZero = true;
+        return;
+      } else {
+        isTdsZero = false;
+      }
+
+      if (!isTdsZero) {
+        const now = new Date().toLocaleTimeString();
+        chart.data.labels.push(now);
+        chart.data.datasets[0].data.push(tdsValue);
+
+        const color = tdsValue < safeThreshold ? '#28a745' : '#dc3545';
+        chart.data.datasets[0].pointBackgroundColor.push(color);
+      }
+
+      if (tdsValue < safeThreshold) {
         statusBox.className = 'safe';
         statusBox.innerText = 'SAFE';
 
-        // Only speak if status changed
         if (lastStatus !== 'safe') {
           speak("Water is safe.");
+          showSafeCelebration();
           lastStatus = 'safe';
         }
       } else {
         statusBox.className = 'unsafe';
         statusBox.innerText = 'UNSAFE';
 
-        // Only speak if status changed
         if (lastStatus !== 'unsafe') {
           speak("Warning, water is not safe.");
+          showUnsafeWarning();
           lastStatus = 'unsafe';
         }
       }
@@ -368,37 +515,37 @@
       chart.update();
     }
 
-    // # MQTT client variable
+    // MQTT client variable
     let client = null;
 
-    // # Function to unlock audio & MQTT connection (called after OK pressed)
+    /**
+     * Unlock audio & MQTT connection
+     */
     function unlockAudioAndConnect() {
-      // Hide message box
       messageBox.style.display = 'none';
-
-      // Connect to public MQTT broker over secure websocket
       client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
 
-      // On successful MQTT connection
       client.on('connect', () => {
         console.log('Connected to MQTT broker');
         client.subscribe(topic);
       });
 
-      // On receiving MQTT messages on subscribed topic
       client.on('message', (topic, message) => {
-        const value = parseFloat(message.toString());
-        if (!isNaN(value)) updateChart(value);
+        const tdsValue = parseFloat(message.toString());
+        if (!isNaN(tdsValue)) {
+          updateChart(tdsValue);
+        }
       });
     }
 
-    // # Show the message box after the heading fade-in animation ends
-    heading.addEventListener('animationend', () => {
-      messageBox.style.display = 'flex';
-    });
-
-    // # OK button triggers unlocking audio & MQTT (but no audio plays here)
+    // Event listeners
     okButton.addEventListener('click', unlockAudioAndConnect);
+
+    // Initial animations
+    setTimeout(() => {
+      heading.style.animationPlayState = 'running';
+      messageBox.style.display = 'flex';
+    }, 1500);
   </script>
 </body>
 </html>
